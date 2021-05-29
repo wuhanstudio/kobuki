@@ -16,6 +16,8 @@ int  kobuki_serial_write_char(uint8_t ch);
 void kobuki_serial_close();
 ```
 
+### Supported APIs
+
 #### Initialization
 
 ```
