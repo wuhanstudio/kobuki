@@ -4,6 +4,18 @@ Kobuki Robot serial communication driver.
 
 <img src="docs/logo_kobuki.png" width="200">
 
+By default, UART2 is used for communication with Kobuki on RT-Thread (RTOS). 
+
+The driver is mostly platform independent. Porting to a new platform only requires implementation of basic serial operations in `kobuki_serial.c`: 
+
+```
+int  kobuki_serial_init();
+char kobuki_serial_read();
+int  kobuki_serial_write(uint8_t* dat, int len);
+int  kobuki_serial_write_char(uint8_t ch);
+void kobuki_serial_close();
+```
+
 #### Initialization
 
 ```
@@ -70,7 +82,7 @@ void kobuki_get_controller_gain();
 void kobuki_reset_controller_gain();
 ```
 
-### Play sound
+#### Play sound
 
 ```
 void kobuki_play_sound(uint16_t note, uint8_t duration);
