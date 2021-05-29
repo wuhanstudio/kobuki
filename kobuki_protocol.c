@@ -74,3 +74,42 @@ void kobuki_get_controller_gain_()
     payload.length = KOBUKI_GET_CONTROLLER_GAIN_LENGTH;
     kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_get_controller_gain_payload_t));
 }
+
+uint8_t kobuki_protocol_loop(uint8_t* packet, uint8_t max_len)
+{
+    char c;
+    char cs = 0; // check sum
+    char len = 0;
+    uint8_t is_packet_ready = 0;
+    while(!is_packet_ready)
+    {
+        c = kobuki_serial_read();
+        if (c == 0xAA)
+        {
+            c = kobuki_serial_read();
+            if(c == 0x55)
+            {
+                is_packet_ready = 1;
+            }
+        }
+    }
+    rt_kprintf("packet ready\n");
+    len = kobuki_serial_read();
+    if(len > max_len)
+    {
+        // buffer overflow
+        return -1;
+    }
+    cs ^= len;
+    int i;
+    for (i = 0; i < len; ++i) {
+        packet[i] = kobuki_serial_read();
+        cs ^= packet[i];
+    }
+    if (!(cs ^= kobuki_serial_read()))
+    {
+        // valid checksum
+        return len;
+    }
+    return 0;
+}

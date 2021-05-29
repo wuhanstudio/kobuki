@@ -70,7 +70,7 @@ MSH_CMD_EXPORT(kobuki_play_sound_cleaning_start_demo, kobuki play sound cleaning
 void kobuki_play_sound_cleaning_end_demo()
 {
     kobuki_init();
-    kobuki_play_sound_cleaning_end_demo();
+    kobuki_play_sound_cleaning_end();
     kobuki_close();
 }
 MSH_CMD_EXPORT(kobuki_play_sound_cleaning_end_demo, kobuki play sound cleaning end demo)

@@ -66,8 +66,8 @@
 #define KOBUKI_UUID_HEADER 0x13
 #define KOBUKI_UUID_LENGTH 0x0C
 
-#define KOBUKI_CONTROLLER_INFO_HEADER 0x01
-#define KOBUKI_CONTROLLER_INFO_LENGTH 0x15G
+#define KOBUKI_CONTROLLER_INFO_HEADER 0x21
+#define KOBUKI_CONTROLLER_INFO_LENGTH 0x15
 
 /* Sound Sequence */
 typedef enum
@@ -309,5 +309,7 @@ void kobuki_set_gpio(uint16_t flag);
 void kobuki_request_extra(uint16_t flag);
 void kobuki_set_controller_gain_(uint8_t type, uint32_t kp, uint32_t ki, uint32_t kd);
 void kobuki_get_controller_gain_();
+
+uint8_t kobuki_protocol_loop(uint8_t* packet, uint8_t len);
 
 #endif /* KOBUKI_PROTOCOL_H_ */

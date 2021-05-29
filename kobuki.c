@@ -174,6 +174,74 @@ void kobuki_get_uuid()
     kobuki_request_extra(KOBUKI_REQUEST_UUID);
 }
 
+static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t len)
+{
+    switch(subpayload[0])
+    {
+    case KOBUKI_BASIC_SENSOR_DATA_HEADER:
+        rt_kprintf("Received basic sensor \n");
+        break;
+    case KOBUKI_DOCKING_IR_HEADER:
+        rt_kprintf("Received docking id \n");
+        break;
+    case KOBUKI_INERTIAL_SENSOR_DATA_HEADER:
+        rt_kprintf("Received inertial sensor \n");
+        break;
+    case KOBUKI_CLIFF_SENSOR_DATA_HEADER:
+        rt_kprintf("Received cliff sensor \n");
+        break;
+    case KOBUKI_CURRENT_HEADER:
+        rt_kprintf("Received current \n");
+        break;
+    case KOBUKI_HARDWARE_VERSION_HEADER:
+        rt_kprintf("Received hardware version \n");
+        break;
+    case KOBUKI_FIRMWARE_VERSION_HEADER:
+        rt_kprintf("Received firmware version \n");
+        break;
+    case KOBUKI_3D_GYRO_RAW_DATA_HEADER:
+        rt_kprintf("Received 3D gyro \n");
+        break;
+    case KOBUKI_GENERAL_PURPOSE_INPUT_HEADER:
+        rt_kprintf("Received general output\n");
+        break;
+    case KOBUKI_UUID_HEADER:
+        rt_kprintf("Received uuid \n");
+        break;
+    case KOBUKI_CONTROLLER_INFO_HEADER:
+        rt_kprintf("Received controller sensor \n");
+        break;
+    default:
+        rt_kprintf("unkown subpayload \n");
+        break;
+    }
+}
+
+void kobuki_loop(kobuki_t robot)
+{
+    int packet_len = kobuki_protocol_loop(robot->packet, KOBUKI_PACKET_BUFFER);
+    if (packet_len < 0)
+    {
+        // buffer overflow
+        return;
+    }
+    else if (packet_len == 0)
+    {
+        // invalid checksum
+        return;
+    }
+    else
+    {
+        // received valid payloads
+        rt_kprintf("received packet %d\n", packet_len);
+        int i;
+        for (i = 0; i < packet_len; i += robot->packet[i+1] + 2) {
+            rt_kprintf("[%d] subpayload len %d\n", i, robot->packet[i+1]);
+            kobuki_parse_subpaylod(robot, robot->packet + i, robot->packet[i+1]);
+        }
+    }
+}
+
 void kobuki_close()
 {
     kobuki_serial_close();
