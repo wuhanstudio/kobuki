@@ -9,6 +9,7 @@
  */
 
 #include <math.h>
+#include "kobuki.h"
 #include "kobuki_serial.h"
 #include "kobuki_protocol.h"
 
@@ -67,13 +68,79 @@ void kobuki_play_sound(uint16_t note, uint8_t duration)
     kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_sound_payload_t));
 }
 
-void kobuki_play_sound_sequence(uint8_t number)
+void kobuki_play_sound_on()
 {
-    kobuki_sound_sequence_payload_t payload;
-    payload.header = KOBUKI_SOUND_SEQUENCE_HEADER;
-    payload.length = KOBUKI_SOUND_SEQUENCE_LENGTH;
-    payload.number = number;
-    kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_sound_sequence_payload_t));
+    kobuki_play_sound_sequence(KOBUKI_SOUND_SEQUENCE_ON);
+}
+
+void kobuki_play_sound_off()
+{
+    kobuki_play_sound_sequence(KOBUKI_SOUND_SEQUENCE_OFF);
+}
+
+void kobuki_play_sound_recharge()
+{
+    kobuki_play_sound_sequence(KOBUKI_SOUND_SEQUENCE_RECHARGE);
+}
+
+void kobuki_play_sound_button()
+{
+    kobuki_play_sound_sequence(KOBUKI_SOUND_SEQUENCE_BUTTON);
+}
+
+void kobuki_play_sound_error()
+{
+    kobuki_play_sound_sequence(KOBUKI_SOUND_SEQUENCE_ERROR);
+}
+
+void kobuki_play_sound_cleaning_start()
+{
+    kobuki_play_sound_sequence(KOBUKI_SOUND_SEQUENCE_CLEANING_START);
+}
+
+void kobuki_play_sound_cleaning_end()
+{
+    kobuki_play_sound_sequence(KOBUKI_SOUND_SEQUENCE_CLEANING_END);
+}
+
+void kobuki_enalbe_3v3()
+{
+    kobuki_set_gpio(KOBUKI_ENABLE_3V3_FLAG);
+}
+
+void kobuki_enable_5v()
+{
+    kobuki_set_gpio(KOBUKI_ENABLE_5V_FLAG);
+}
+
+void kobuki_enable_12v_5a()
+{
+    kobuki_set_gpio(KOBUKI_ENABLE_12V_5A_FLAG);
+}
+
+void kobuki_enable_12v_1_5a()
+{
+    kobuki_set_gpio(KOBUKI_ENABLE_12V_1_5_A_FLAG);
+}
+
+void kobuki_set_led1_red()
+{
+    kobuki_set_gpio(KOBUKI_LED1_RED_FLAG);
+}
+
+void kobuki_set_led1_green()
+{
+    kobuki_set_gpio(KOBUKI_LED1_GREEN_FLAG);
+}
+
+void kobuki_set_led2_red()
+{
+    kobuki_set_gpio(KOBUKI_LED2_RED_FLAG);
+}
+
+void kobuki_set_led2_green()
+{
+    kobuki_set_gpio(KOBUKI_LED2_GREEN_FLAG);
 }
 
 void kobuki_close()

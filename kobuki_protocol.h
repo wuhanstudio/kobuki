@@ -69,6 +69,43 @@
 #define KOBUKI_CONTROLLER_INFO_HEADER 0x01
 #define KOBUKI_CONTROLLER_INFO_LENGTH 0x15G
 
+/* Sound Sequence */
+typedef enum
+{
+    KOBUKI_SOUND_SEQUENCE_ON,
+    KOBUKI_SOUND_SEQUENCE_OFF,
+    KOBUKI_SOUND_SEQUENCE_RECHARGE,
+    KOBUKI_SOUND_SEQUENCE_BUTTON,
+    KOBUKI_SOUND_SEQUENCE_ERROR,
+    KOBUKI_SOUND_SEQUENCE_CLEANING_START,
+    KOBUKI_SOUND_SEQUENCE_CLEANING_END
+} kobuki_sound_sequence;
+
+/* Request extra */
+typedef enum
+{
+    KOBUKI_REQUEST_HARDWARE_VERSION_ID = 0x01,
+    KOBUKI_REQUEST_FIRMWARE_VERSION_ID = 0x02,
+    KOBUKI_REQUEST_UUID = 0x08,
+} kobuki_request_id;
+
+/* Request extra */
+typedef enum
+{
+    KOBUKI_GPIO0_HIGH_FLAG = 0x0001,
+    KOBUKI_GPIO1_HIGH_FLAG = 0x0002,
+    KOBUKI_GPIO2_HIGH_FLAG = 0x0004,
+    KOBUKI_GPIO3_HIGH_FLAG = 0x0008,
+    KOBUKI_ENABLE_3V3_FLAG = 0X010,
+    KOBUKI_ENABLE_5V_FLAG = 0x0020,
+    KOBUKI_ENABLE_12V_5A_FLAG = 0x0040,
+    KOBUKI_ENABLE_12V_1_5_A_FLAG = 0x0080,
+    KOBUKI_LED1_RED_FLAG = 0x0100,
+    KOBUKI_LED1_GREEN_FLAG = 0x0200,
+    KOBUKI_LED2_RED_FLAG = 0x0400,
+    KOBUKI_LED2_GREEN_FLAG = 0x0800
+} kobuki_gpio_id;
+
 
 // Bytestream
 typedef struct _kobuki_bytestream {
@@ -266,5 +303,8 @@ typedef struct _kobuki_controller_info_payload {
 
 
 int kobuki_protocol_send_payload(uint8_t* payload, uint8_t len);
+void kobuki_play_sound_sequence(uint8_t number);
+void kobuki_request_extra(uint16_t flag);
+void kobuki_set_gpio(uint16_t flag);
 
 #endif /* KOBUKI_PROTOCOL_H_ */

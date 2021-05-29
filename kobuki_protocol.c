@@ -27,3 +27,27 @@ int kobuki_protocol_send_payload(uint8_t* payload, uint8_t len)
 
     return ret;
 }
+
+void kobuki_play_sound_sequence(uint8_t number)
+{
+    kobuki_sound_sequence_payload_t payload;
+    payload.header = KOBUKI_SOUND_SEQUENCE_HEADER;
+    payload.length = KOBUKI_SOUND_SEQUENCE_LENGTH;
+    payload.number = number;
+    kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_sound_sequence_payload_t));
+}
+
+void kobuki_request_extra(uint16_t flag)
+{
+
+}
+
+void kobuki_set_gpio(uint16_t flag)
+{
+    kobuki_general_output_payload_t payload;
+    payload.header = KOBUKI_GENERAL_OUTPUT_HEADER;
+    payload.length = KOBUKI_GENERAL_OUTPUT_LENGTH;
+    payload.flags = flag;
+    kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_general_output_payload_t));
+}
+
