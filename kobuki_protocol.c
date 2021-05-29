@@ -14,6 +14,7 @@ int kobuki_protocol_send_payload(uint8_t* payload, uint8_t len)
 {
     uint8_t ret = 0;
     uint8_t cs = len;
+    // Checksum
     for (int i = 0; i < len; i++)
     {
       cs ^= payload[i];

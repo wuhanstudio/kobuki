@@ -7,8 +7,8 @@
  * Date           Author       Notes
  * 2021-05-28     hw630       the first version
  */
-#ifndef APPLICATIONS_KOBUKI_H_
-#define APPLICATIONS_KOBUKI_H_
+#ifndef KOBUKI_H_
+#define KOBUKI_H_
 
 /* Sound Sequence */
 typedef enum
@@ -26,4 +26,4 @@ void kobuki_setup();
 void kobuki_set_speed(double tv, double rv);
 void kobuki_play_sound_sequence(uint8_t number);
 
-#endif /* APPLICATIONS_KOBUKI_H_ */
+#endif /* KOBUKI_H_ */

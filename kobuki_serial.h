@@ -7,8 +7,8 @@
  * Date           Author       Notes
  * 2021-05-28     hw630       the first version
  */
-#ifndef APPLICATIONS_KOBUKI_SERIAL_H_
-#define APPLICATIONS_KOBUKI_SERIAL_H_
+#ifndef KOBUKI_SERIAL_H_
+#define KOBUKI_SERIAL_H_
 
 #include <rtthread.h>
 
@@ -21,4 +21,4 @@ char kobuki_serial_read();
 int  kobuki_serial_write(uint8_t* dat, int len);
 int  kobuki_serial_write_char(uint8_t ch);
 
-#endif /* APPLICATIONS_KOBUKI_SERIAL_H_ */
+#endif /* KOBUKI_SERIAL_H_ */
