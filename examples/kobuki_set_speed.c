@@ -14,16 +14,15 @@
 
 void kobuki_set_speed_demo(int argc, char* argv[])
 {
-    char *eptr;
-
-    kobuki_setup();
-    if(argc == 2)
+    kobuki_init();
+    if(argc == 3)
     {
-        kobuki_set_speed(strtod(argv[1], &eptr), strtod(argv[2], &eptr));
+        kobuki_set_speed(atof(argv[1]), atof(argv[2]));
     }
     else
     {
         rt_kprintf("kobuki_set_speed_demo [tv] [rv]\n");
     }
+    kobuki_close();
 }
 MSH_CMD_EXPORT(kobuki_set_speed_demo, kobuki_set_speed_demo [tv] [rv])

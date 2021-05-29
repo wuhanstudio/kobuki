@@ -15,9 +15,9 @@
 // b is bias or wheelbase, that indicates the length between the center of the wheels. Fixed at 230 mm.
 static float wheelbase = 0.230;
 
-void kobuki_setup()
+void kobuki_init()
 {
-    kobuki_serial_setup();
+    kobuki_serial_init();
 }
 
 // cm / s
@@ -56,6 +56,17 @@ void kobuki_set_speed(double tv, double rv)
     kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_base_control_payload_t));
 }
 
+// 1 / (f * a), where f is frequency of sound in Hz, and a is 0.00000275
+void kobuki_play_sound(uint16_t note, uint8_t duration)
+{
+    kobuki_sound_payload_t payload;
+    payload.header = KOBUKI_SOUND_HEADER;
+    payload.length = KOBUKI_SOUND_LENGTH;
+    payload.note = note;
+    payload.duration = duration;
+    kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_sound_payload_t));
+}
+
 void kobuki_play_sound_sequence(uint8_t number)
 {
     kobuki_sound_sequence_payload_t payload;
@@ -63,4 +74,9 @@ void kobuki_play_sound_sequence(uint8_t number)
     payload.length = KOBUKI_SOUND_SEQUENCE_LENGTH;
     payload.number = number;
     kobuki_protocol_send_payload( (uint8_t*) (&payload), sizeof(kobuki_sound_sequence_payload_t));
+}
+
+void kobuki_close()
+{
+    kobuki_serial_close();
 }

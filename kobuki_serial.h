@@ -16,9 +16,10 @@
     #define KOBUKI_SERIAL_NAME "uart2"
 #endif
 
-int  kobuki_serial_setup();
+int  kobuki_serial_init();
 char kobuki_serial_read();
 int  kobuki_serial_write(uint8_t* dat, int len);
 int  kobuki_serial_write_char(uint8_t ch);
+void kobuki_serial_close();
 
 #endif /* KOBUKI_SERIAL_H_ */

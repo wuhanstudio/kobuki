@@ -24,7 +24,7 @@ static rt_err_t uart_input(rt_device_t dev, rt_size_t size)
     return RT_EOK;
 }
 
-int kobuki_serial_setup()
+int kobuki_serial_init()
 {
     kobuki_serial = rt_device_find(KOBUKI_SERIAL_NAME);
     if (!kobuki_serial)
@@ -57,4 +57,10 @@ int kobuki_serial_write_char(uint8_t ch)
 int  kobuki_serial_write(uint8_t* dat, int len)
 {
     return rt_device_write(kobuki_serial, 0, dat, len);
+}
+
+void kobuki_serial_close()
+{
+    rt_device_close(kobuki_serial);
+    rt_sem_detach(&rx_sem);
 }

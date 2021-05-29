@@ -22,8 +22,10 @@ typedef enum
     KOBUKI_SOUND_SEQUENCE_CLEANING_END
 } kobuki_sound_sequence;
 
-void kobuki_setup();
+void kobuki_init();
 void kobuki_set_speed(double tv, double rv);
+void kobuki_play_sound(uint16_t note, uint8_t duration);
 void kobuki_play_sound_sequence(uint8_t number);
+void kobuki_close();
 
 #endif /* KOBUKI_H_ */
