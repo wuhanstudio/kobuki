@@ -131,3 +131,8 @@ void kobuki_get_firmware_version();
 ```
 void kobuki_get_uuid();
 ```
+
+### Todo List
+
+- Parse feedbacks from periodical 50 Hz data
+- Pase requested data
