@@ -20,12 +20,14 @@ void kobuki_enalbe_3v3();
 void kobuki_enable_5v();
 void kobuki_enable_12v_5a();
 void kobuki_enable_12v_1_5a();
+
 void kobuki_set_led1_red();
 void kobuki_set_led1_green();
 void kobuki_set_led2_red();
 void kobuki_set_led2_green();
 
 void kobuki_set_controller_gain(uint32_t kp, uint32_t ki, uint32_t kd);
+void kobuki_get_controller_gain();
 void kobuki_reset_controller_gain();
 
 void kobuki_get_hardware_version();

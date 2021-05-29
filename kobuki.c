@@ -143,6 +143,37 @@ void kobuki_set_led2_green()
     kobuki_set_gpio(KOBUKI_LED2_GREEN_FLAG);
 }
 
+void kobuki_set_controller_gain(uint32_t kp, uint32_t ki, uint32_t kd)
+{
+    kobuki_set_controller_gain_(1, kp, ki, kd);
+}
+
+void kobuki_get_controller_gain()
+{
+    kobuki_get_controller_gain_();
+}
+
+
+void kobuki_reset_controller_gain()
+{
+    kobuki_set_controller_gain_(0, 0, 0, 0);
+}
+
+void kobuki_get_hardware_version()
+{
+    kobuki_request_extra(KOBUKI_REQUEST_HARDWARE_VERSION_ID);
+}
+
+void kobuki_get_firmware_version()
+{
+    kobuki_request_extra(KOBUKI_REQUEST_FIRMWARE_VERSION_ID);
+}
+
+void kobuki_get_uuid()
+{
+    kobuki_request_extra(KOBUKI_REQUEST_UUID);
+}
+
 void kobuki_close()
 {
     kobuki_serial_close();

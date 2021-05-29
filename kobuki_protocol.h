@@ -303,8 +303,11 @@ typedef struct _kobuki_controller_info_payload {
 
 
 int kobuki_protocol_send_payload(uint8_t* payload, uint8_t len);
+
 void kobuki_play_sound_sequence(uint8_t number);
-void kobuki_request_extra(uint16_t flag);
 void kobuki_set_gpio(uint16_t flag);
+void kobuki_request_extra(uint16_t flag);
+void kobuki_set_controller_gain_(uint8_t type, uint32_t kp, uint32_t ki, uint32_t kd);
+void kobuki_get_controller_gain_();
 
 #endif /* KOBUKI_PROTOCOL_H_ */
