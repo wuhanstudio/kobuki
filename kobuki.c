@@ -244,15 +244,19 @@ static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t 
         break;
 
     case KOBUKI_INERTIAL_SENSOR_DATA_HEADER:
-
+        robot->inertial_angle           = ((kobuki_inertial_sensor_data_payload_t*)subpayload)->angle;
+        robot->inertial_angle_rate      = ((kobuki_inertial_sensor_data_payload_t*)subpayload)->angle_rate;
         break;
 
     case KOBUKI_CLIFF_SENSOR_DATA_HEADER:
-
+        robot->left_cliff_adc = ((kobuki_cliff_sensor_data_payload_t*)subpayload)->left_cliff_sensor;
+        robot->central_cliff_adc = ((kobuki_cliff_sensor_data_payload_t*)subpayload)->central_cliff_sensor;
+        robot->right_cliff_adc = ((kobuki_cliff_sensor_data_payload_t*)subpayload)->right_cliff_sensor;
         break;
 
     case KOBUKI_CURRENT_HEADER:
-
+        robot->left_motor_current = ((kobuki_current_payload_t*)subpayload)->left_motor;
+        robot->right_motor_current = ((kobuki_current_payload_t*)subpayload)->right_motor;
         break;
 
     case KOBUKI_HARDWARE_VERSION_HEADER:
@@ -270,11 +274,14 @@ static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t 
         break;
 
     case KOBUKI_3D_GYRO_RAW_DATA_HEADER:
-
+        // We don't need raw data because angle and angular velocity can be retrieved from Inertial Sensor Data
         break;
 
     case KOBUKI_GENERAL_PURPOSE_INPUT_HEADER:
-
+        robot->analog_input_0 = ((kobuki_general_purpose_input_payload_t*)subpayload)->analog_input_ch_0;
+        robot->analog_input_1 = ((kobuki_general_purpose_input_payload_t*)subpayload)->analog_input_ch_1;
+        robot->analog_input_2 = ((kobuki_general_purpose_input_payload_t*)subpayload)->analog_input_ch_2;
+        robot->analog_input_3 = ((kobuki_general_purpose_input_payload_t*)subpayload)->analog_input_ch_3;
         break;
 
     case KOBUKI_UUID_HEADER:
@@ -285,7 +292,9 @@ static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t 
         break;
 
     case KOBUKI_CONTROLLER_INFO_HEADER:
-
+        robot->kp = ((kobuki_controller_info_payload_t*)subpayload)->p_gain;
+        robot->ki = ((kobuki_controller_info_payload_t*)subpayload)->i_gain;
+        robot->kd = ((kobuki_controller_info_payload_t*)subpayload)->d_gain;
         rt_event_send(&(robot->event), KOBUKI_RECV_CONTROLLER_INFO_EVENT);
         break;
 

@@ -290,19 +290,20 @@ typedef struct _kobuki_firmware_version_payload {
 } __attribute__((packed)) kobuki_firmware_version_payload_t;
 
 // Raw Data Of 3D Gyro
-typedef struct _kobuki_3d_gyro_raw_data {
-    uint8_t x;
-    uint8_t y;
-    uint8_t z;
-} __attribute__((packed)) kobuki_3d_gyro_raw_data_t;
-
-typedef struct _kobuki_3d_gyro_raw_data_payload {
-    uint8_t header;
-    uint8_t length;
-    uint8_t frame_id;
-    uint8_t followed_data_length;
-    kobuki_3d_gyro_raw_data_t* raw_data;
-} __attribute__((packed)) kobuki_3d_gyro_raw_data_payload_t;
+// We don't need raw data because angle and angular velocity can be retrieved from Inertial Sensor Data
+//typedef struct _kobuki_3d_gyro_raw_data {
+//    uint8_t x;
+//    uint8_t y;
+//    uint8_t z;
+//} __attribute__((packed)) kobuki_3d_gyro_raw_data_t;
+//
+//typedef struct _kobuki_3d_gyro_raw_data_payload {
+//    uint8_t header;
+//    uint8_t length;
+//    uint8_t frame_id;
+//    uint8_t followed_data_length;
+//    kobuki_3d_gyro_raw_data_t raw_data[3];
+//} __attribute__((packed)) kobuki_3d_gyro_raw_data_payload_t;
 
 // General Purpose Input
 typedef struct _kobuki_general_purpose_input_payload {
@@ -316,7 +317,7 @@ typedef struct _kobuki_general_purpose_input_payload {
     uint16_t unused_0;
     uint16_t unused_1;
     uint16_t unused_2;
-} __attribute__((packed)) _kobuki_general_purpose_input_payload_t;
+} __attribute__((packed)) kobuki_general_purpose_input_payload_t;
 
 // Unique Device IDentifier(UDID)
 typedef struct _kobuki_uuid_payload {

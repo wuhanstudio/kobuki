@@ -102,9 +102,6 @@ struct kobuki {
     uint8_t firmware_version_minor;
     uint8_t firmware_version_patch;
 
-    // 3D gyro
-
-
     // digital input
     uint16_t digital_input;
     uint8_t  digital_input_0;
