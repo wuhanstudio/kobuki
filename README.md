@@ -135,4 +135,4 @@ void kobuki_get_uuid();
 
 ### Todo List
 
-- Pase requested data
+- Odometry
