@@ -14,6 +14,7 @@ char kobuki_serial_read();
 int  kobuki_serial_write(uint8_t* dat, int len);
 int  kobuki_serial_write_char(uint8_t ch);
 void kobuki_serial_close();
+int kobuki_get_tick();
 ```
 
 ### Supported APIs
