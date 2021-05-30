@@ -14,7 +14,8 @@
 
 void kobuki_play_sound_demo(int argc, char* argv[])
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     if(argc == 3)
     {
         kobuki_play_sound(atof(argv[1]), atof(argv[2]));
@@ -23,54 +24,60 @@ void kobuki_play_sound_demo(int argc, char* argv[])
     {
         rt_kprintf("kobuki_play_sound_demo [note] [duration]\n");
     }
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_play_sound_demo, kobuki play sound demo)
 
 void kobuki_play_sound_on_demo()
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_play_sound_on();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_play_sound_on_demo, kobuki play sound on demo)
 
 void kobuki_play_sound_off_demo()
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_play_sound_off();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_play_sound_off_demo, kobuki play sound off demo)
 
 void kobuki_play_sound_recharge_demo()
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_play_sound_recharge();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_play_sound_recharge_demo, kobuki play sound recharge demo)
 
 void kobuki_play_sound_button_demo()
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_play_sound_button();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_play_sound_button_demo, kobuki play sound button demo)
 
 void kobuki_play_sound_cleaning_start_demo()
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_play_sound_cleaning_start();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_play_sound_cleaning_start_demo, kobuki play sound cleaning start demo)
 
 void kobuki_play_sound_cleaning_end_demo()
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_play_sound_cleaning_end();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_play_sound_cleaning_end_demo, kobuki play sound cleaning end demo)

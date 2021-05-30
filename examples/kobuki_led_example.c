@@ -14,32 +14,36 @@
 
 void kobuki_led1_red(int argc, char* argv[])
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_set_led1_red();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_led1_red, kobuki set led1 red)
 
 void kobuki_led1_green(int argc, char* argv[])
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_set_led1_green();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_led1_green, kobuki set led1 green)
 
 void kobuki_led2_red(int argc, char* argv[])
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_set_led2_red();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_led2_red, kobuki set led2 red)
 
 void kobuki_led2_green(int argc, char* argv[])
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     kobuki_set_led2_green();
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_led2_green, kobuki set led2 green)

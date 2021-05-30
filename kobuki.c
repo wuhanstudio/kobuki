@@ -13,15 +13,26 @@
 #include "kobuki_serial.h"
 #include "kobuki_protocol.h"
 
+#define DBG_SECTION_NAME  "kobuki"
+#define DBG_LEVEL         DBG_LOG
+#include <rtdbg.h>
+
 // b is bias or wheelbase, that indicates the length between the center of the wheels. Fixed at 230 mm.
 static float wheelbase = 0.230;
 
-void kobuki_init()
+int kobuki_init(kobuki_t robot)
 {
-    kobuki_serial_init();
+    rt_err_t result;
+    result = rt_event_init(&(robot->event), "kobuki_event", RT_IPC_FLAG_FIFO);
+    robot->connected = 0;
+    if (result != RT_EOK)
+    {
+        return -2;
+    }
+    return kobuki_serial_init();
 }
 
-// cm / s
+// translation velocity and rotation velocity (cm / s)
 void kobuki_set_speed(double tv, double rv)
 {
     kobuki_base_control_payload_t payload;
@@ -34,7 +45,7 @@ void kobuki_set_speed(double tv, double rv)
 
     if (fabs(tv) < 1)
     {
-        // Pure rotation
+        // pure rotation
         payload.radius = 1;
         payload.speed =  (int16_t) (rv * b2);
     }
@@ -179,46 +190,122 @@ static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t 
     switch(subpayload[0])
     {
     case KOBUKI_BASIC_SENSOR_DATA_HEADER:
-        rt_kprintf("Received basic sensor \n");
+        robot->timestamp        = ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp;
+
+        robot->bumper           = ((kobuki_basic_sensor_data_payload_t*)subpayload)->bumper_flag;
+        robot->left_bumper      = ((kobuki_basic_sensor_data_payload_t*)subpayload)->bumper_flag & KOBUKI_LEFT_BUMPER_FLAG    ? 1 : 0;
+        robot->central_bumper   = ((kobuki_basic_sensor_data_payload_t*)subpayload)->bumper_flag & KOBUKI_CENTRAL_BUMPER_FLAG ? 1 : 0;
+        robot->right_bumper     = ((kobuki_basic_sensor_data_payload_t*)subpayload)->bumper_flag & KOBUKI_RIGHT_BUMPER_FLAG   ? 1 : 0;
+
+        robot->wheel_drop       = ((kobuki_basic_sensor_data_payload_t*)subpayload)->wheel_drop_flag;
+        robot->left_wheel_drop  = ((kobuki_basic_sensor_data_payload_t*)subpayload)->wheel_drop_flag & KOBUKI_LEFT_WHEEL_DROP_FLAG  ? 1 : 0;
+        robot->right_wheel_drop = ((kobuki_basic_sensor_data_payload_t*)subpayload)->wheel_drop_flag & KOBUKI_RIGHT_WHEEL_DROP_FLAG ? 1 : 0;
+
+        robot->cliff            = ((kobuki_basic_sensor_data_payload_t*)subpayload)->cliff_flag;
+        robot->left_cliff       = ((kobuki_basic_sensor_data_payload_t*)subpayload)->cliff_flag & KOBUKI_LEFT_CLIFF_FLAG    ? 1 : 0;
+        robot->central_cliff    = ((kobuki_basic_sensor_data_payload_t*)subpayload)->cliff_flag & KOBUKI_CENTRAL_CLIFF_FLAG ? 1 : 0;
+        robot->right_cliff      = ((kobuki_basic_sensor_data_payload_t*)subpayload)->cliff_flag & KOBUKI_RIGHT_CLIFF_FLAG   ? 1 : 0;
+
+        robot->left_encoder     = ((kobuki_basic_sensor_data_payload_t*)subpayload)->left_encoder;
+        robot->right_encoder    = ((kobuki_basic_sensor_data_payload_t*)subpayload)->right_encoder;
+
+        robot->left_pwm         = ((kobuki_basic_sensor_data_payload_t*)subpayload)->left_pwm;
+        robot->right_pwm        = ((kobuki_basic_sensor_data_payload_t*)subpayload)->right_pwm;
+
+        robot->button           = ((kobuki_basic_sensor_data_payload_t*)subpayload)->button_flag;
+        robot->button_0         = ((kobuki_basic_sensor_data_payload_t*)subpayload)->button_flag & KOBUKI_BUTTON_0_FLAG ? 1 : 0;
+        robot->button_1         = ((kobuki_basic_sensor_data_payload_t*)subpayload)->button_flag & KOBUKI_BUTTON_1_FLAG ? 1 : 0;
+        robot->button_2         = ((kobuki_basic_sensor_data_payload_t*)subpayload)->button_flag & KOBUKI_BUTTON_2_FLAG ? 1 : 0;
+
+        robot->charger                  = ((kobuki_basic_sensor_data_payload_t*)subpayload)->charger_flag;
+        robot->charger_discharging      = ((kobuki_basic_sensor_data_payload_t*)subpayload)->charger_flag == KOBUKI_DISCHARGING_FLAG      ? 1 : 0;
+        robot->charger_docking_charged  = ((kobuki_basic_sensor_data_payload_t*)subpayload)->charger_flag == KOBUKI_DOCKING_CHARGED_FLAG  ? 1 : 0;
+        robot->charger_docking_charging = ((kobuki_basic_sensor_data_payload_t*)subpayload)->charger_flag == KOBUKI_DOCKING_CHARGING_FLAG ? 1 : 0;
+        robot->charger_adapter_charged  = ((kobuki_basic_sensor_data_payload_t*)subpayload)->charger_flag == KOBUKI_ADAPTER_CHARGED_FLAG  ? 1 : 0;
+        robot->charger_adapter_charging = ((kobuki_basic_sensor_data_payload_t*)subpayload)->charger_flag == KOBUKI_ADAPTER_CHARGING_FLAG ? 1 : 0;
+
+        robot->wheel_overcurrent        = ((kobuki_basic_sensor_data_payload_t*)subpayload)->overcurrent_flag;
+        robot->left_wheel_overcurrent   = ((kobuki_basic_sensor_data_payload_t*)subpayload)->overcurrent_flag & KOBUKI_LEFT_WHEEL_OVERCURRENT_FLAG  ? 1 : 0;
+        robot->right_wheel_overcurrent  = ((kobuki_basic_sensor_data_payload_t*)subpayload)->overcurrent_flag & KOBUKI_RIGHT_WHEEL_OVERCURRENT_FLAG ? 1 : 0;
         break;
+
     case KOBUKI_DOCKING_IR_HEADER:
-        rt_kprintf("Received docking id \n");
+        robot->docking_ir_left          = ((kobuki_docking_ir_payload_t*)subpayload)->left_signal;
+        robot->docking_ir_center        = ((kobuki_docking_ir_payload_t*)subpayload)->central_signal;
+        robot->docking_ir_right         = ((kobuki_docking_ir_payload_t*)subpayload)->right_signal;
+
+        robot->docking_ir_far_left      = ((kobuki_docking_ir_payload_t*)subpayload)->central_signal & KOBUKI_DOCKING_IR_FAR_LEFT_FLAG ? 1 : 0;
+        robot->docking_ir_far_center    = ((kobuki_docking_ir_payload_t*)subpayload)->central_signal & KOBUKI_DOCKING_IR_FAR_CENTER_FLAG ? 1 : 0;
+        robot->docking_ir_far_right     = ((kobuki_docking_ir_payload_t*)subpayload)->central_signal & KOBUKI_DOCKING_IR_FAR_RIGHT_FLAG ? 1 : 0;
+
+        robot->docking_ir_near_left     = ((kobuki_docking_ir_payload_t*)subpayload)->central_signal & KOBUKI_DOCKING_IR_NEAR_LEFT_FLAG ? 1 : 0;
+        robot->docking_ir_near_center   = ((kobuki_docking_ir_payload_t*)subpayload)->central_signal & KOBUKI_DOCKING_IR_NEAR_CENTER_FLAG ? 1 : 0;
+        robot->docking_ir_near_right    = ((kobuki_docking_ir_payload_t*)subpayload)->central_signal & KOBUKI_DOCKING_IR_NEAR_RIGHT_FLAG ? 1 : 0;
         break;
+
     case KOBUKI_INERTIAL_SENSOR_DATA_HEADER:
-        rt_kprintf("Received inertial sensor \n");
+
         break;
+
     case KOBUKI_CLIFF_SENSOR_DATA_HEADER:
-        rt_kprintf("Received cliff sensor \n");
+
         break;
+
     case KOBUKI_CURRENT_HEADER:
-        rt_kprintf("Received current \n");
+
         break;
+
     case KOBUKI_HARDWARE_VERSION_HEADER:
-        rt_kprintf("Received hardware version \n");
+        robot->harware_version_major = ((kobuki_hardware_version_payload_t*)subpayload)->major;
+        robot->harware_version_minor = ((kobuki_hardware_version_payload_t*)subpayload)->minor;
+        robot->harware_version_patch = ((kobuki_hardware_version_payload_t*)subpayload)->pathch;
+        rt_event_send(&(robot->event), KOBUKI_RECV_HARDWARE_EVENT);
         break;
+
     case KOBUKI_FIRMWARE_VERSION_HEADER:
-        rt_kprintf("Received firmware version \n");
+        robot->firmware_version_major = ((kobuki_firmware_version_payload_t*)subpayload)->major;
+        robot->firmware_version_minor = ((kobuki_firmware_version_payload_t*)subpayload)->minor;
+        robot->firmware_version_patch = ((kobuki_firmware_version_payload_t*)subpayload)->pathch;
+        rt_event_send(&(robot->event), KOBUKI_RECV_FIRMWARE_EVENT);
         break;
+
     case KOBUKI_3D_GYRO_RAW_DATA_HEADER:
-        rt_kprintf("Received 3D gyro \n");
+
         break;
+
     case KOBUKI_GENERAL_PURPOSE_INPUT_HEADER:
-        rt_kprintf("Received general output\n");
+
         break;
+
     case KOBUKI_UUID_HEADER:
-        rt_kprintf("Received uuid \n");
+        robot->uuid_0 =((kobuki_uuid_payload_t*)subpayload)->uuid_0;
+        robot->uuid_1 =((kobuki_uuid_payload_t*)subpayload)->uuid_1;
+        robot->uuid_2 =((kobuki_uuid_payload_t*)subpayload)->uuid_2;
+        rt_event_send(&(robot->event), KOBUKI_RECV_UUID_EVENT);
         break;
+
     case KOBUKI_CONTROLLER_INFO_HEADER:
-        rt_kprintf("Received controller sensor \n");
+
+        rt_event_send(&(robot->event), KOBUKI_RECV_CONTROLLER_INFO_EVENT);
         break;
+
     default:
-        rt_kprintf("unkown subpayload \n");
+        LOG_E("Unknown Payload\n");
         break;
     }
 }
 
 void kobuki_loop(kobuki_t robot)
 {
+    if( (kobuki_get_tick() - robot->last_sync_tick) > KOBUKI_SYNC_TIMEOUT)
+    {
+        robot->connected = 0;
+    }
+    else
+    {
+        robot->connected = 1;
+    }
+
     int packet_len = kobuki_protocol_loop(robot->packet, KOBUKI_PACKET_BUFFER);
     if (packet_len < 0)
     {
@@ -232,17 +319,16 @@ void kobuki_loop(kobuki_t robot)
     }
     else
     {
-        // received valid payloads
-        rt_kprintf("received packet %d\n", packet_len);
+        robot->last_sync_tick   = kobuki_get_tick();
         int i;
         for (i = 0; i < packet_len; i += robot->packet[i+1] + 2) {
-            rt_kprintf("[%d] subpayload len %d\n", i, robot->packet[i+1]);
             kobuki_parse_subpaylod(robot, robot->packet + i, robot->packet[i+1]);
         }
     }
 }
 
-void kobuki_close()
+void kobuki_close(kobuki_t robot)
 {
+    rt_event_detach(&(robot->event));
     kobuki_serial_close();
 }

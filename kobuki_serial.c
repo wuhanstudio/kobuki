@@ -42,9 +42,14 @@ int kobuki_serial_init()
 char kobuki_serial_read()
 {
     char ch;
+    int tick = kobuki_get_tick();
     while (rt_device_read(kobuki_serial, -1, &ch, 1) != 1)
     {
-        rt_sem_take(&rx_sem, RT_WAITING_FOREVER);
+        rt_sem_take(&rx_sem, KOBUKI_SERIAL_TIMEOUT / 5);
+        if( (kobuki_get_tick() - tick) > KOBUKI_SERIAL_TIMEOUT)
+        {
+            return -1;
+        }
     }
     return ch;
 }
@@ -63,4 +68,9 @@ void kobuki_serial_close()
 {
     rt_device_close(kobuki_serial);
     rt_sem_detach(&rx_sem);
+}
+
+int kobuki_get_tick()
+{
+    return rt_tick_get();
 }

@@ -12,8 +12,13 @@
 
 #include <rtthread.h>
 
+
 #ifndef KOBUKI_SERIAL_NAME
     #define KOBUKI_SERIAL_NAME "uart2"
+#endif
+
+#ifndef KOBUKI_SERIAL_TIMEOUT
+    #define KOBUKI_SERIAL_TIMEOUT 500
 #endif
 
 int  kobuki_serial_init();
@@ -21,5 +26,7 @@ char kobuki_serial_read();
 int  kobuki_serial_write(uint8_t* dat, int len);
 int  kobuki_serial_write_char(uint8_t ch);
 void kobuki_serial_close();
+
+int kobuki_get_tick();
 
 #endif /* KOBUKI_SERIAL_H_ */

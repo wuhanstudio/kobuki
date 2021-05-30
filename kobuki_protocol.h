@@ -13,61 +13,97 @@
 #include <stdint.h>
 #include "kobuki_serial.h"
 
-#define KOBUKI_BYTE_STREAM_HEADER_0 0xAA
-#define KOBUKI_BYTE_STREAM_HEADER_1 0x55
+// Command Packets
 
-#define KOBUKI_BASE_CONTROL_HEADER 0x01
-#define KOBUKI_BASE_CONTROL_LENGTH 0x04
+#define KOBUKI_BYTE_STREAM_HEADER_0         0xAA
+#define KOBUKI_BYTE_STREAM_HEADER_1         0x55
 
-#define KOBUKI_SOUND_HEADER 0x03
-#define KOBUKI_SOUND_LENGTH 0x03
+#define KOBUKI_BASE_CONTROL_HEADER          0x01
+#define KOBUKI_BASE_CONTROL_LENGTH          0x04
 
-#define KOBUKI_SOUND_SEQUENCE_HEADER 0x04
-#define KOBUKI_SOUND_SEQUENCE_LENGTH 0x01
+#define KOBUKI_SOUND_HEADER                 0x03
+#define KOBUKI_SOUND_LENGTH                 0x03
 
-#define KOBUKI_REQUEST_EXTRA_HEADER 0x09
-#define KOBUKI_REQUEST_EXTRA_LENGTH 0x02
+#define KOBUKI_SOUND_SEQUENCE_HEADER        0x04
+#define KOBUKI_SOUND_SEQUENCE_LENGTH        0x01
 
-#define KOBUKI_GENERAL_OUTPUT_HEADER 0x0C
-#define KOBUKI_GENERAL_OUTPUT_LENGTH 0x02
+#define KOBUKI_REQUEST_EXTRA_HEADER         0x09
+#define KOBUKI_REQUEST_EXTRA_LENGTH         0x02
 
-#define KOBUKI_SET_CONTROLLER_GAIN_HEADER 0x01
-#define KOBUKI_SET_CONTROLLER_GAIN_LENGTH 0x0D
+#define KOBUKI_GENERAL_OUTPUT_HEADER        0x0C
+#define KOBUKI_GENERAL_OUTPUT_LENGTH        0x02
 
-#define KOBUKI_GET_CONTROLLER_GAIN_HEADER 0x01
-#define KOBUKI_GET_CONTROLLER_GAIN_LENGTH 0x0E
+#define KOBUKI_SET_CONTROLLER_GAIN_HEADER   0x0D    // Possible typo in documentation
+#define KOBUKI_SET_CONTROLLER_GAIN_LENGTH   0x0D
 
-#define KOBUKI_BASIC_SENSOR_DATA_HEADER 0x01
-#define KOBUKI_BASIC_SENSOR_DATA_LENGTH 0x0F
+#define KOBUKI_GET_CONTROLLER_GAIN_HEADER   0x0E    // Possible typo in documentation
+#define KOBUKI_GET_CONTROLLER_GAIN_LENGTH   0x0E
 
-#define KOBUKI_DOCKING_IR_HEADER 0x03
-#define KOBUKI_DOCKING_ID_LENGTH 0x03
+// Feedback Packets
 
-#define KOBUKI_INERTIAL_SENSOR_DATA_HEADER 0x04
-#define KOBUKI_INERTIAL_SENSOR_DATA_LENGTH 0x07
+#define KOBUKI_BASIC_SENSOR_DATA_HEADER     0x01
+#define KOBUKI_BASIC_SENSOR_DATA_LENGTH     0x0F
 
-#define KOBUKI_CLIFF_SENSOR_DATA_HEADER 0x05
-#define KOBUKI_CLIFFL_SENSOR_DATA_LENGTH 0x06
+#define KOBUKI_DOCKING_IR_HEADER            0x03
+#define KOBUKI_DOCKING_ID_LENGTH            0x03
 
-#define KOBUKI_CURRENT_HEADER 0x06
-#define KOBUKI_CURRENT_LENGTH 0x02
+#define KOBUKI_INERTIAL_SENSOR_DATA_HEADER  0x04
+#define KOBUKI_INERTIAL_SENSOR_DATA_LENGTH  0x07
 
-#define KOBUKI_HARDWARE_VERSION_HEADER 0x0A
-#define KOBUKI_HARDWARE_VERSION_LENGTH 0x04
+#define KOBUKI_CLIFF_SENSOR_DATA_HEADER     0x05
+#define KOBUKI_CLIFFL_SENSOR_DATA_LENGTH    0x06
 
-#define KOBUKI_FIRMWARE_VERSION_HEADER 0x0B
-#define KOBUKI_FIRMWARE_VERSION_LENGTH 0x04
+#define KOBUKI_CURRENT_HEADER               0x06
+#define KOBUKI_CURRENT_LENGTH               0x02
 
-#define KOBUKI_3D_GYRO_RAW_DATA_HEADER 0x0D
+#define KOBUKI_HARDWARE_VERSION_HEADER      0x0A
+#define KOBUKI_HARDWARE_VERSION_LENGTH      0x04
+
+#define KOBUKI_FIRMWARE_VERSION_HEADER      0x0B
+#define KOBUKI_FIRMWARE_VERSION_LENGTH      0x04
+
+#define KOBUKI_3D_GYRO_RAW_DATA_HEADER      0x0D
 
 #define KOBUKI_GENERAL_PURPOSE_INPUT_HEADER 0x10
 #define KOBUKI_GENERAL_PURPOSE_INPUT_LENGTH 0x10
 
-#define KOBUKI_UUID_HEADER 0x13
-#define KOBUKI_UUID_LENGTH 0x0C
+#define KOBUKI_UUID_HEADER                  0x13
+#define KOBUKI_UUID_LENGTH                  0x0C
 
-#define KOBUKI_CONTROLLER_INFO_HEADER 0x21
-#define KOBUKI_CONTROLLER_INFO_LENGTH 0x15
+#define KOBUKI_CONTROLLER_INFO_HEADER       0x21    // Possible typo in documentation
+#define KOBUKI_CONTROLLER_INFO_LENGTH       0x15
+
+#define KOBUKI_LEFT_BUMPER_FLAG             0x04
+#define KOBUKI_CENTRAL_BUMPER_FLAG          0x02
+#define KOBUKI_RIGHT_BUMPER_FLAG            0x01
+
+#define KOBUKI_LEFT_WHEEL_DROP_FLAG         0x02
+#define KOBUKI_RIGHT_WHEEL_DROP_FLAG        0x01
+
+#define KOBUKI_LEFT_CLIFF_FLAG              0x04
+#define KOBUKI_CENTRAL_CLIFF_FLAG           0x02
+#define KOBUKI_RIGHT_CLIFF_FLAG             0x01
+
+#define KOBUKI_BUTTON_0_FLAG                0x01
+#define KOBUKI_BUTTON_1_FLAG                0x02
+#define KOBUKI_BUTTON_2_FLAG                0x04
+
+#define KOBUKI_DISCHARGING_FLAG             0x00
+#define KOBUKI_DOCKING_CHARGED_FLAG         0x02
+#define KOBUKI_DOCKING_CHARGING_FLAG        0x06
+#define KOBUKI_ADAPTER_CHARGED_FLAG         0x18
+#define KOBUKI_ADAPTER_CHARGING_FLAG        0x22
+
+#define KOBUKI_LEFT_WHEEL_OVERCURRENT_FLAG  0x01
+#define KOBUKI_RIGHT_WHEEL_OVERCURRENT_FLAG 0x02
+
+#define KOBUKI_DOCKING_IR_NEAR_LEFT_FLAG    0x01
+#define KOBUKI_DOCKING_IR_NEAR_CENTER_FLAG  0x02
+#define KOBUKI_DOCKING_IR_NEAR_RIGHT_FLAG   0x04
+
+#define KOBUKI_DOCKING_IR_FAR_LEFT_FLAG     0x08
+#define KOBUKI_DOCKING_IR_FAR_CENTER_FLAG   0x10
+#define KOBUKI_DOCKING_IR_FAR_RIGHT_FLAG    0x20
 
 /* Sound Sequence */
 typedef enum
@@ -197,13 +233,13 @@ typedef struct _kobuki_basic_sensor_data_payload {
 } __attribute__((packed)) kobuki_basic_sensor_data_payload_t;
 
 // Docking IR
-typedef struct _kobuki_docking_id_payload {
+typedef struct _kobuki_docking_ir_payload {
     uint8_t header;
     uint8_t length;
     uint8_t right_signal;
-    uint8_t central_signa;
+    uint8_t central_signal;
     uint8_t left_signal;
-} __attribute__((packed)) kobuki_docking_ir_t;
+} __attribute__((packed)) kobuki_docking_ir_payload_t;
 
 // Inertial Sensor Data
 typedef struct _kobuki_inertial_sensor_data_payload {
@@ -310,6 +346,6 @@ void kobuki_request_extra(uint16_t flag);
 void kobuki_set_controller_gain_(uint8_t type, uint32_t kp, uint32_t ki, uint32_t kd);
 void kobuki_get_controller_gain_();
 
-uint8_t kobuki_protocol_loop(uint8_t* packet, uint8_t len);
+int8_t kobuki_protocol_loop(uint8_t* packet, uint8_t len);
 
 #endif /* KOBUKI_PROTOCOL_H_ */

@@ -14,7 +14,8 @@
 
 void kobuki_set_speed_example(int argc, char* argv[])
 {
-    kobuki_init();
+    struct kobuki robot;
+    kobuki_init(&robot);
     if(argc == 3)
     {
         kobuki_set_speed(atof(argv[1]), atof(argv[2]));
@@ -23,6 +24,6 @@ void kobuki_set_speed_example(int argc, char* argv[])
     {
         rt_kprintf("kobuki_set_speed_example [tv] [rv]\n");
     }
-    kobuki_close();
+    kobuki_close(&robot);
 }
 MSH_CMD_EXPORT(kobuki_set_speed_example, kobuki_set_speed_example [tv] [rv])
