@@ -17,18 +17,31 @@
 #define DBG_LEVEL         DBG_LOG
 #include <rtdbg.h>
 
+ #define M_PI 3.14159265358979323846264338327950288
+
 // b is bias or wheelbase, that indicates the length between the center of the wheels. Fixed at 230 mm.
 static float wheelbase = 0.230;
+
+static float left_ticks_per_m  = 1./11724.41658029856624751591;
+static float right_ticks_per_m = 1./11724.41658029856624751591;
 
 int kobuki_init(kobuki_t robot)
 {
     rt_err_t result;
     result = rt_event_init(&(robot->event), "kobuki_event", RT_IPC_FLAG_FIFO);
+
     robot->connected = 0;
+    robot->last_sync_tick = 0;
+
+    robot->x = 0;
+    robot->y = 0;
+    robot->theta = 0;
+
     if (result != RT_EOK)
     {
         return -2;
     }
+
     return kobuki_serial_init();
 }
 
@@ -185,11 +198,51 @@ void kobuki_get_uuid()
     kobuki_request_extra(KOBUKI_REQUEST_UUID);
 }
 
+static void kobuki_update_odometry(kobuki_t robot, uint16_t left_encoder, uint16_t right_encoder, uint16_t elapsed_time_ms)
+{
+    double dl= left_ticks_per_m * (left_encoder- robot->left_encoder);
+    double dr= right_ticks_per_m * (right_encoder - robot->right_encoder);
+    double dx = 0, dy = 0;
+    double dtheta = (dr-dl) / wheelbase;
+
+    if (dl != dr)
+    {
+      double R = 0.5 * (dr + dl) / dtheta;
+      dx = R * sin(dtheta);
+      dy = R * (1-cos(dtheta));
+    } else
+    {
+      dx = dr;
+    }
+    double s = sin(robot->theta);
+    double c = cos(robot->theta);
+    double diff_x = c * dx - s * dy;
+    //ROS_INFO_STREAM("Elapsed " << elapsed_time_ms << " distance " << diff_x);
+    robot->v_x = diff_x / ((elapsed_time_ms) / 1000.0);
+    robot->x += diff_x;
+    robot->y += s * dx + c * dy;
+    robot->theta += dtheta;
+    robot->theta = fmod(robot->theta + 4 * M_PI, 2 * M_PI);
+    if (robot->theta > M_PI)
+    {
+        robot->theta -= 2*M_PI;
+    }
+}
+
 static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t len)
 {
     switch(subpayload[0])
     {
     case KOBUKI_BASIC_SENSOR_DATA_HEADER:
+        if(robot->last_sync_tick > 0)
+        {
+            kobuki_update_odometry(robot,
+                    ((kobuki_basic_sensor_data_payload_t*)subpayload)->left_encoder,
+                    ((kobuki_basic_sensor_data_payload_t*)subpayload)->right_encoder,
+                    ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp - robot->timestamp);
+
+        }
+
         robot->timestamp        = ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp;
 
         robot->bumper           = ((kobuki_basic_sensor_data_payload_t*)subpayload)->bumper_flag;
@@ -227,6 +280,7 @@ static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t 
         robot->wheel_overcurrent        = ((kobuki_basic_sensor_data_payload_t*)subpayload)->overcurrent_flag;
         robot->left_wheel_overcurrent   = ((kobuki_basic_sensor_data_payload_t*)subpayload)->overcurrent_flag & KOBUKI_LEFT_WHEEL_OVERCURRENT_FLAG  ? 1 : 0;
         robot->right_wheel_overcurrent  = ((kobuki_basic_sensor_data_payload_t*)subpayload)->overcurrent_flag & KOBUKI_RIGHT_WHEEL_OVERCURRENT_FLAG ? 1 : 0;
+
         break;
 
     case KOBUKI_DOCKING_IR_HEADER:
@@ -246,6 +300,7 @@ static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t 
     case KOBUKI_INERTIAL_SENSOR_DATA_HEADER:
         robot->inertial_angle           = ((kobuki_inertial_sensor_data_payload_t*)subpayload)->angle;
         robot->inertial_angle_rate      = ((kobuki_inertial_sensor_data_payload_t*)subpayload)->angle_rate;
+        robot->v_theta                  = ( (double)(((kobuki_inertial_sensor_data_payload_t*)subpayload)->angle_rate) / 100.0) * (M_PI / 180.0);
         break;
 
     case KOBUKI_CLIFF_SENSOR_DATA_HEADER:

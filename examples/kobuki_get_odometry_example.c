@@ -9,6 +9,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <rtthread.h>
 #include <kobuki.h>
 
@@ -21,7 +22,7 @@ static struct rt_thread thread1;
 static char thread2_stack[1024];
 static struct rt_thread thread2;
 
-struct kobuki robot;
+static struct kobuki robot;
 
 static void kobuki_thread_entry(void *param)
 {
@@ -33,31 +34,23 @@ static void kobuki_thread_entry(void *param)
 
 static void kobuki_get_odometry_entry(void* param)
 {
-    rt_uint32_t e;
-
     while(!robot.connected)
     {
         rt_thread_mdelay(50);
     }
     rt_kprintf("\n");
 
-    kobuki_get_hardware_version();
-    while (!rt_event_recv(&(robot.event), KOBUKI_RECV_HARDWARE_EVENT,RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,RT_WAITING_FOREVER, &e) == RT_EOK);
-    rt_kprintf("Hardware Version: %d.%d.%d\n", robot.harware_version_major, robot.harware_version_minor, robot.harware_version_patch);
-
-    kobuki_get_firmware_version();
-    while (!rt_event_recv(&(robot.event), KOBUKI_RECV_FIRMWARE_EVENT,RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,RT_WAITING_FOREVER, &e) == RT_EOK);
-    rt_kprintf("Firmware Version: %d.%d.%d\n", robot.firmware_version_major, robot.firmware_version_minor, robot.firmware_version_patch);
-
-    kobuki_get_uuid();
-    while (!rt_event_recv(&(robot.event), KOBUKI_RECV_UUID_EVENT,RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,RT_WAITING_FOREVER, &e) == RT_EOK);
-    rt_kprintf("Kobuki UUID: %X-%X-%X\n", robot.uuid_0, robot.uuid_1, robot.uuid_2);
+    while(1)
+    {
+			printf("[kobuki] x: %f \t y: %f \t theta: %f \t v_x: %f \t v_theta: %f\n", robot.x, robot.y, robot.theta, robot.v_x, robot.v_theta);
+        rt_thread_mdelay(50);
+    }
 
     rt_thread_detach(&thread1);
     kobuki_close(&robot);
 }
 
-void kobuki_get_version(int argc, char* argv[])
+void kobuki_get_odometry(int argc, char* argv[])
 {
     if (kobuki_init(&robot) < 0)
     {
@@ -75,7 +68,7 @@ void kobuki_get_version(int argc, char* argv[])
     rt_thread_startup(&thread1);
 
     rt_thread_init(&thread2,
-                       "kobuki_version",
+                       "kobuki_odom",
                        kobuki_get_odometry_entry,
                        RT_NULL,
                        &thread2_stack[0],
@@ -83,4 +76,4 @@ void kobuki_get_version(int argc, char* argv[])
                        THREAD_PRIORITY - 1, THREAD_TIMESLICE);
     rt_thread_startup(&thread2);
 }
-MSH_CMD_EXPORT(kobuki_get_version, kobuki get version)
+MSH_CMD_EXPORT(kobuki_get_odometry, kobuki get odometry)

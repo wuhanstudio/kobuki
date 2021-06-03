@@ -245,8 +245,8 @@ typedef struct _kobuki_docking_ir_payload {
 typedef struct _kobuki_inertial_sensor_data_payload {
     uint8_t header;
     uint8_t length;
-    uint16_t angle;
-    uint16_t angle_rate;
+    int16_t angle;
+    int16_t angle_rate;
     uint8_t unused_0;
     uint8_t unused_1;
     uint8_t unused_2;
@@ -345,7 +345,7 @@ void kobuki_play_sound_sequence(uint8_t number);
 void kobuki_set_gpio(uint16_t flag);
 void kobuki_request_extra(uint16_t flag);
 void kobuki_set_controller_gain_(uint8_t type, uint32_t kp, uint32_t ki, uint32_t kd);
-void kobuki_get_controller_gain_();
+void kobuki_get_controller_gain_(void);
 
 int8_t kobuki_protocol_loop(uint8_t* packet, uint8_t len);
 

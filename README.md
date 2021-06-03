@@ -253,6 +253,3 @@ struct kobuki {
 } kobuki;
 ```
 
-### Todo List
-
-- Odometry

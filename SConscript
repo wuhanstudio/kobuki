@@ -7,6 +7,9 @@ cwd     = GetCurrentDir()
 # The set of source files associated with this SConscript file.
 src     = Glob('*.c')
 
+if GetDepend('KOBUKI_USING_GET_ODOMETRY_EXAMPLE'):
+	src    += Glob('examples/kobuki_get_odometry_example.c')
+
 if GetDepend('KOBUKI_USING_GET_VERSION_EXAMPLE'):
 	src    += Glob('examples/kobuki_get_version_example.c')
 
