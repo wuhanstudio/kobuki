@@ -9,6 +9,7 @@
  */
 
 #include <math.h>
+#include <stdio.h>
 #include "kobuki.h"
 #include "kobuki_serial.h"
 #include "kobuki_protocol.h"
@@ -17,7 +18,10 @@
 #define DBG_LEVEL         DBG_LOG
 #include <rtdbg.h>
 
- #define M_PI 3.14159265358979323846264338327950288
+#define M_PI 3.14159265358979323846264338327950288
+#define ENCODER_UPPER_WRAP 45875
+#define ENCODER_LOWER_WRAP 19660
+
 
 // b is bias or wheelbase, that indicates the length between the center of the wheels. Fixed at 230 mm.
 static float wheelbase = 0.230;
@@ -200,16 +204,42 @@ void kobuki_get_uuid()
 
 static void kobuki_update_odometry(kobuki_t robot, uint16_t left_encoder, uint16_t right_encoder, uint16_t elapsed_time_ms)
 {
-    double dl= left_ticks_per_m * (left_encoder- robot->left_encoder);
-    double dr= right_ticks_per_m * (right_encoder - robot->right_encoder);
+    double dl, dr;
+    if( (left_encoder > ENCODER_UPPER_WRAP && robot->left_encoder < ENCODER_LOWER_WRAP) )
+    {
+        dl = left_ticks_per_m * ( (left_encoder - 65536) - robot->left_encoder);
+    }
+    else if((left_encoder < ENCODER_UPPER_WRAP && robot->left_encoder > ENCODER_LOWER_WRAP))
+    {
+        dl = left_ticks_per_m * (left_encoder + (65536 - robot->left_encoder));
+    }
+    else
+    {
+        dl = left_ticks_per_m * (left_encoder - robot->left_encoder);
+    }
+
+    if( (right_encoder > ENCODER_UPPER_WRAP && robot->right_encoder < ENCODER_LOWER_WRAP) )
+    {
+        dr = right_ticks_per_m * ( (right_encoder - 65536) - robot->right_encoder);
+    }
+    else if((right_encoder < ENCODER_UPPER_WRAP && robot->right_encoder > ENCODER_LOWER_WRAP))
+    {
+        dr = right_ticks_per_m * (right_encoder + (65536 - robot->right_encoder));
+    }
+    else
+    {
+        dr = right_ticks_per_m * (right_encoder - robot->right_encoder);
+    }
+
     double dx = 0, dy = 0;
-    double dtheta = (dr-dl) / wheelbase;
+    double dtheta = (dr - dl) / wheelbase;
+    // printf("%d\n", left_encoder - robot->left_encoder);
 
     if (dl != dr)
     {
       double R = 0.5 * (dr + dl) / dtheta;
       dx = R * sin(dtheta);
-      dy = R * (1-cos(dtheta));
+      dy = R * (1 - cos(dtheta));
     } else
     {
       dx = dr;

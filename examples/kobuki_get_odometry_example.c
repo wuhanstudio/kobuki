@@ -44,7 +44,7 @@ static void kobuki_get_odometry_entry(void* param)
     {
         if(robot.connected)
         {
-            printf("[kobuki] x: %f \ty: %f \ttheta: %f \tv_x: %f \tv_theta: %f\n", robot.x, robot.y, robot.theta, robot.v_x, robot.v_theta);
+            printf("[kobuki] x: %f\ty: %f\ttheta: %f\tv_x: %f\tv_theta: %f\n", robot.x, robot.y, robot.theta, robot.v_x, robot.v_theta);
         }
         else
         {
