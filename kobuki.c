@@ -390,7 +390,7 @@ void kobuki_loop(kobuki_t robot)
     }
     else
     {
-        robot->last_sync_tick   = kobuki_get_tick();
+        robot->last_sync_tick = kobuki_get_tick();
         int i;
         for (i = 0; i < packet_len; i += robot->packet[i+1] + 2) {
             kobuki_parse_subpaylod(robot, robot->packet + i, robot->packet[i+1]);

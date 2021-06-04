@@ -89,10 +89,10 @@ int8_t kobuki_protocol_loop(uint8_t* packet, uint8_t max_len)
     int tick = kobuki_get_tick();
     while(!is_packet_ready)
     {
-        c = kobuki_serial_read();
+        kobuki_serial_read(&c);
         if (c == 0xAA)
         {
-            c = kobuki_serial_read();
+            kobuki_serial_read(&c);
             if(c == 0x55)
             {
                 is_packet_ready = 1;
@@ -104,7 +104,7 @@ int8_t kobuki_protocol_loop(uint8_t* packet, uint8_t max_len)
         }
     }
 
-    len = kobuki_serial_read();
+    kobuki_serial_read(&len);
     if(len > max_len)
     {
         LOG_E("Buffer Overflow");
@@ -114,10 +114,19 @@ int8_t kobuki_protocol_loop(uint8_t* packet, uint8_t max_len)
     cs ^= len;
     int i;
     for (i = 0; i < len; ++i) {
-        packet[i] = kobuki_serial_read();
-        cs ^= packet[i];
+        if(kobuki_serial_read(&packet[i]) == 0)
+        {
+            // Timeout
+            return -2;
+        }
+        else 
+        {
+            cs ^= packet[i];
+        }
     }
-    if (cs ^= kobuki_serial_read())
+    char cs_;
+    kobuki_serial_read(&cs_);
+    if (cs ^= cs_)
     {
         LOG_E("Invalid Checksum");
         return 0;

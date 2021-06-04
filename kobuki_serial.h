@@ -22,11 +22,11 @@
 #endif
 
 int  kobuki_serial_init(void);
-char kobuki_serial_read(void);
+char kobuki_serial_read(char* ch);
 int  kobuki_serial_write(uint8_t* dat, int len);
 int  kobuki_serial_write_char(uint8_t ch);
 void kobuki_serial_close(void);
 
-int kobuki_get_tick(void);
+uint32_t kobuki_get_tick(void);
 
 #endif /* KOBUKI_SERIAL_H_ */

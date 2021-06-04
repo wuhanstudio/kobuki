@@ -42,7 +42,14 @@ static void kobuki_get_odometry_entry(void* param)
 
     while(1)
     {
-        printf("[kobuki] x: %f \t y: %f \t theta: %f \t v_x: %f \t v_theta: %f\n", robot.x, robot.y, robot.theta, robot.v_x, robot.v_theta);
+        if(robot.connected)
+        {
+            printf("[kobuki] x: %f \ty: %f \ttheta: %f \tv_x: %f \tv_theta: %f\n", robot.x, robot.y, robot.theta, robot.v_x, robot.v_theta);
+        }
+        else
+        {
+            rt_kprintf("[kobuki] Lost Connection\n");
+        }
         rt_thread_mdelay(50);
     }
 
