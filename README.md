@@ -10,7 +10,7 @@ The driver is mostly platform independent. Porting to a new platform only requir
 
 ```
 int  kobuki_serial_init();
-char kobuki_serial_read();
+int  kobuki_serial_read(char* ch);
 int  kobuki_serial_write(uint8_t* dat, int len);
 int  kobuki_serial_write_char(uint8_t ch);
 void kobuki_serial_close();
