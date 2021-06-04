@@ -137,8 +137,16 @@ void kobuki_get_uuid();
 
 ```
 struct kobuki {
+    // triggered when new data comes in
     struct rt_event event;
-    
+
+    // odometry
+    float x;
+    float y;
+    float theta;
+    float v_x;
+    float v_theta;
+
     // connection status
     uint8_t  connected;
     uint32_t last_sync_tick;

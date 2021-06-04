@@ -68,8 +68,8 @@ struct kobuki {
     uint16_t right_encoder;
 
     // motor pwm
-    uint8_t  left_pwm;
-    uint8_t  right_pwm;
+    int8_t  left_pwm;
+    int8_t  right_pwm;
 
     // button status
     uint8_t  button;

@@ -231,16 +231,23 @@ static void kobuki_update_odometry(kobuki_t robot, uint16_t left_encoder, uint16
 
 static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t len)
 {
+    int32_t elapsed_time = 0;
     switch(subpayload[0])
     {
     case KOBUKI_BASIC_SENSOR_DATA_HEADER:
         if(robot->last_sync_tick > 0)
         {
+            if( ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp > robot->timestamp ) {
+                elapsed_time = ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp - robot->timestamp;
+            }
+            else
+            {
+                elapsed_time = 65535 - robot->timestamp + ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp;
+            }
             kobuki_update_odometry(robot,
                     ((kobuki_basic_sensor_data_payload_t*)subpayload)->left_encoder,
                     ((kobuki_basic_sensor_data_payload_t*)subpayload)->right_encoder,
-                    ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp - robot->timestamp);
-
+                    elapsed_time);
         }
 
         robot->timestamp        = ((kobuki_basic_sensor_data_payload_t*)subpayload)->timestamp;
@@ -262,8 +269,8 @@ static void kobuki_parse_subpaylod(kobuki_t robot, uint8_t* subpayload, uint8_t 
         robot->left_encoder     = ((kobuki_basic_sensor_data_payload_t*)subpayload)->left_encoder;
         robot->right_encoder    = ((kobuki_basic_sensor_data_payload_t*)subpayload)->right_encoder;
 
-        robot->left_pwm         = ((kobuki_basic_sensor_data_payload_t*)subpayload)->left_pwm;
-        robot->right_pwm        = ((kobuki_basic_sensor_data_payload_t*)subpayload)->right_pwm;
+        robot->left_pwm         = (int8_t)((kobuki_basic_sensor_data_payload_t*)subpayload)->left_pwm;
+        robot->right_pwm        = (int8_t)((kobuki_basic_sensor_data_payload_t*)subpayload)->right_pwm;
 
         robot->button           = ((kobuki_basic_sensor_data_payload_t*)subpayload)->button_flag;
         robot->button_0         = ((kobuki_basic_sensor_data_payload_t*)subpayload)->button_flag & KOBUKI_BUTTON_0_FLAG ? 1 : 0;

@@ -42,12 +42,12 @@ static void kobuki_get_odometry_entry(void* param)
 
     while(1)
     {
-			printf("[kobuki] x: %f \t y: %f \t theta: %f \t v_x: %f \t v_theta: %f\n", robot.x, robot.y, robot.theta, robot.v_x, robot.v_theta);
+        printf("[kobuki] x: %f \t y: %f \t theta: %f \t v_x: %f \t v_theta: %f\n", robot.x, robot.y, robot.theta, robot.v_x, robot.v_theta);
         rt_thread_mdelay(50);
     }
 
-    rt_thread_detach(&thread1);
-    kobuki_close(&robot);
+    // rt_thread_detach(&thread1);
+    // kobuki_close(&robot);
 }
 
 void kobuki_get_odometry(int argc, char* argv[])
