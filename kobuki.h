@@ -10,6 +10,10 @@
 #ifndef KOBUKI_H_
 #define KOBUKI_H_
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 #include <rtthread.h>
 
 #ifndef KOBUKI_PACKET_BUFFER
@@ -182,5 +186,10 @@ void kobuki_play_sound_button(void);
 void kobuki_play_sound_error(void);
 void kobuki_play_sound_cleaning_start(void);
 void kobuki_play_sound_cleaning_end(void);
+
+
+#ifdef __cplusplus
+    }
+#endif
 
 #endif /* KOBUKI_H_ */
